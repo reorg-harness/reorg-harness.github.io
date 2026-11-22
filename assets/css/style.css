@@ -89,7 +89,10 @@ sup { font-size: .68em; }
 .hero { padding: 64px 0 24px; text-align: center; }
 .eyebrow { display: inline-flex; align-items: center; gap: 10px; font: 500 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--coral-ink); margin: 0 0 22px; }
 .eyebrow::before, .eyebrow::after { content: ""; width: 22px; height: 1px; background: currentColor; opacity: .5; }
-.hero-title { font-size: clamp(30px, 5.2vw, 54px); line-height: 1.08; font-weight: 700; max-width: 960px; margin: 0 auto; letter-spacing: -0.03em; text-wrap: balance; }
+/* Two lines from 760px up: "…Organization Skills" is ~20.9em wide, so font-size stays under container/20.9. */
+.hero-title { font-size: clamp(27px, 4.4vw, 52px); line-height: 1.1; font-weight: 700; margin: 0 auto; letter-spacing: -0.03em; text-wrap: balance; }
+.hero-title .br-wide { display: none; }
+@media (min-width: 760px) { .hero-title .br-wide { display: inline; } }
 .hero-title b { color: var(--coral-ink); font-weight: 700; }
 .hero-title .accent { color: var(--ink); }
 .authors { margin: 26px auto 4px; max-width: 860px; font-size: 15.5px; color: var(--ink); }
