@@ -183,22 +183,22 @@
       { k: 'Revise', t: 'Worker revises' },
     ];
     const CAPTIONS = [
-      'The worker completes the task with its ordinary tools and produces a first draft, A₀.',
+      'The agent completes the task with its ordinary tools and produces a first draft.',
       'The planner reads the task and the work state, decides reflection is needed, and retrieves a skill from the frozen library.',
       'A same-job teammate inspects the memo and the source files in a read-only context, and flags a defect.',
       'The legal and risk reviewer sees the teammate’s contribution and proposes a concrete change.',
-      'The manager loops in an environmental partner, and the two return one consolidated discussion summary.',
-      'The contributions are combined into a compact handoff for the worker.',
-      'Only the worker edits the deliverable. The planner then stops, or retrieves another skill for the next round (up to three).',
+      'The manager loops in an environmental partner and returns one combined view.',
+      'The perspectives are combined into compact guidance for the agent.',
+      'Only the agent edits the deliverable. The planner then stops, or retrieves another skill for the next round (up to three).',
     ];
     const MSGS = [
       { cls: 'system', html: '<p><b>Task.</b> Prepare a site acquisition memo covering environmental risk and closing readiness.</p>' },
-      { cls: 'system', html: '<p><b>Planner.</b> The closing recommendation rests on an insurance assumption. Reflection needed, so it retrieves a three-stakeholder skill.</p>' },
+      { cls: 'system', html: '<p><b>Planner.</b> The closing recommendation rests on an insurance assumption. Reflection needed, so it retrieves an organizational skill from the library.</p>' },
       { role: 'same_job_teammate', act: 'feedback', text: 'I found that the policy excludes pollution risk. The memo cannot describe that risk as insured.' },
       { role: 'legal_risk_reviewer', act: 'propose', text: 'I propose adding a one-year seller reserve. Keep the closing recommendation conditional.' },
       { role: 'direct_manager', act: 'loop_in', sub: 'with Environmental partner (domain expert)', text: 'I consulted our environmental partner: monitoring lasts three years. Extend the reserve.' },
-      { cls: 'handoff', head: 'Team handoff', text: 'Flag the uninsured risk. Seek a three-year reserve. Keep closing conditional on agreement and funding.' },
-      { cls: 'worker', head: 'Worker', text: 'I revised the memo to flag the uninsured pollution risk and propose a three-year seller reserve. Closing remains conditional on agreement and funding.' },
+      { cls: 'handoff', head: 'Combined guidance', text: 'Flag the uninsured risk. Seek a three-year reserve. Keep closing conditional on agreement and funding.' },
+      { cls: 'worker', head: 'Agent', text: 'I revised the memo to flag the uninsured pollution risk and propose a three-year seller reserve. Closing remains conditional on agreement and funding.' },
     ];
     const AV = { same_job_teammate: 'var(--yellow)', legal_risk_reviewer: 'var(--blue-light)', direct_manager: 'var(--coral)' };
 
@@ -286,7 +286,7 @@
     }
     function renderMemo() {
       const revised = step >= 6;
-      $('#rMemoTitle').textContent = revised ? 'Worker’s memo, revised' : 'Worker’s memo, first draft';
+      $('#rMemoTitle').textContent = revised ? 'Agent’s memo, revised' : 'Agent’s memo, first draft';
       $('#rMemoBody').innerHTML = MEMO.map(l => `<div class="memo-line${revised ? ' added' : ''}"><span class="k">${l.k}</span><span>${revised ? l.b : l.a}</span></div>`).join('');
     }
     function go(i) {
@@ -613,6 +613,50 @@
     });
     t.innerHTML = html + '</tbody>';
   })();
+
+  // Procedural vs organizational knowledge: gain over the single worker, derived from MAIN.
+  function procData(model) {
+    const off = model === 'gemini' ? 0 : 3;
+    const single = MAIN.find(r => r.fam === 'single');
+    const ours = MAIN.filter(r => r.fam === 'ours').pop();
+    const procs = MAIN.filter(r => r.fam === 'proc');
+    return ['GDPval', 'JobBench', 'LAB'].map((bench, j) => {
+      const c = off + j;
+      const best = procs.reduce((a, b) => (b.v[c] > a.v[c] ? b : a));
+      return { bench, s: single.v[c], pm: best.name, pa: best.v[c], p: best.v[c] - single.v[c], ra: ours.v[c], r: ours.v[c] - single.v[c] };
+    });
+  }
+  function procChart(w, model) {
+    const data = procData(model);
+    const H = w < 420 ? 250 : 270;
+    const m = { l: 34, r: 8, t: 22, b: 30 };
+    const svg = svgRoot(w, H);
+    const iw = w - m.l - m.r, ih = H - m.t - m.b;
+    const y0 = -2, y1 = 14;
+    const Y = v => m.t + ih - (v - y0) / (y1 - y0) * ih;
+    for (let v = y0; v <= y1; v += 2) {
+      el('line', { x1: m.l, x2: w - m.r, y1: Y(v), y2: Y(v), stroke: v === 0 ? 'var(--ink-3)' : 'var(--line)', 'stroke-dasharray': v === 0 ? null : '3 4' }, svg);
+      el('text', { x: m.l - 7, y: Y(v) + 4, 'text-anchor': 'end', 'font-size': 11, fill: 'var(--ink-3)', text: v > 0 ? '+' + v : v }, svg);
+    }
+    const gw = iw / data.length, bw = Math.min(44, gw * 0.3), gap = 6;
+    data.forEach((d, i) => {
+      const cx = m.l + gw * i + gw / 2;
+      [[d.p, 'var(--blue-deep)', `Best procedural method (${d.pm}): ${d.pa.toFixed(1)} vs. ${d.s.toFixed(1)} for the single worker`],
+       [d.r, 'var(--coral)', `ReOrg: ${d.ra.toFixed(1)} vs. ${d.s.toFixed(1)} for the single worker`]].forEach(([v, color, tip], k) => {
+        const x = cx + (k === 0 ? -bw - gap / 2 : gap / 2);
+        const top = Math.min(Y(v), Y(0)), hgt = Math.abs(Y(v) - Y(0));
+        const r = el('rect', { x, y: top, width: bw, height: Math.max(1, hgt), rx: 3, fill: color }, svg);
+        el('title', { text: tip }, r);
+        const label = (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(1);
+        el('text', { x: x + bw / 2, y: v >= 0 ? Y(v) - 6 : Y(v) + 14, 'text-anchor': 'middle', 'font-size': 12.5, 'font-weight': k === 1 ? 700 : 600, fill: k === 1 ? 'var(--coral-ink)' : 'var(--ink-2)', text: label }, svg);
+      });
+      el('text', { x: cx, y: H - m.b + 20, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 600, fill: 'var(--ink)', text: d.bench }, svg);
+    });
+    el('text', { x: m.l, y: 11, 'font-size': 12.5, fill: 'var(--ink-2)', text: 'Gain over single worker (points)' }, svg);
+    return svg;
+  }
+  mount($('#procGemini'), w => procChart(w, 'gemini'));
+  mount($('#procQwen'), w => procChart(w, 'qwen'));
 
   function heatmap(vals) {
     return function (w) {

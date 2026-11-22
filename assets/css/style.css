@@ -277,7 +277,7 @@ input[type=range] { width: 100%; margin: 12px 0 2px; accent-color: var(--coral-i
 .takeaway .hl { color: var(--coral-ink); }
 .result-card { padding: 22px; }
 .result-note { font-size: 14px; color: var(--ink-3); margin: 12px 0 0; }
-.cost-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+.chart-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
 .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 table.results { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 640px; font-variant-numeric: tabular-nums; }
 table.results th, table.results td { padding: 8px 10px; text-align: right; border-bottom: 1px solid var(--line); }
@@ -347,7 +347,7 @@ table.results tr.ours td { color: var(--ink); }
   .section { padding-top: 64px; }
   .steps { grid-template-columns: repeat(7, auto); overflow-x: auto; scrollbar-width: none; }
   .steps li { font-size: 13.5px; }
-  .cost-pair { grid-template-columns: 1fr; gap: 20px; }
+  .chart-pair { grid-template-columns: 1fr; gap: 20px; }
   .scrub-row { flex-wrap: wrap; gap: 10px 12px; }
   .scrub-info { order: 3; flex-basis: 100%; }
   .scrub-count { margin-left: auto; }
