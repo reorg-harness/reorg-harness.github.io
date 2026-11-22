@@ -22,7 +22,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@1,6..72,400;1,6..72,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=4">
+<link rel="stylesheet" href="assets/css/style.css?v=5">
 <script>
   // Apply a saved theme before first paint.
   try { var t = localStorage.getItem('reorg-theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch (e) {}
@@ -61,10 +61,9 @@
 <section class="hero wrap">
   <h1 class="hero-title"><span class="accent">ReOrg</span>: Evolving <b>Re</b>flective <b>Org</b>anization Skills<br class="br-wide"> for Enterprise Agents</h1>
   <p class="authors">
-    <span>Di Wu<sup>1*</sup></span>, <span>Rujun Han<sup>2</sup></span>, <span>Yanfei Chen<sup>2</sup></span>, <span>Yifei Ming<sup>2</sup></span>, <span>Han Yu<sup>2</sup></span>, <span>Yufan Zhuang<sup>2</sup></span>, <span>Tomas Pfister<sup>2</sup></span>, and <span>Chen-Yu Lee<sup>2</sup></span>
+    <span>Di Wu<sup>1</sup></span>, <span>Rujun Han<sup>2</sup></span>, <span>Yanfei Chen<sup>2</sup></span>, <span>Yifei Ming<sup>2</sup></span>, <span>Han Yu<sup>2</sup></span>, <span>Yufan Zhuang<sup>2</sup></span>, <span>Tomas Pfister<sup>2</sup></span>, and <span>Chen-Yu Lee<sup>2</sup></span>
   </p>
   <p class="affils"><sup>1</sup>University of California, Los Angeles <span class="dot">·</span> <sup>2</sup>Google Cloud AI Research</p>
-  <p class="note">*Work done while Di Wu interned at Google Cloud AI Research.</p>
 
   <p class="tagline"><span class="muted">One agent does the work.</span><br>A learned organization makes it ready to hand off.</p>
 
@@ -112,20 +111,20 @@
     <div class="prose">
       <p>Long-horizon agents can now write the memo, build the spreadsheet and draft the deck. Whether that artifact is ready for someone else depends on who reads it. A manager checks whether it answers the assignment. A legal reviewer checks what could go wrong when it is relied on. A teammate checks the numbers.</p>
       <p>People get these perspectives from the organization around them. Agents usually get two choices: wait for a human to give more guidance, or critique their own work. In a pilot, feedback from a single simulated manager already beat the agent's own self-review.</p>
-      <p class="pull">Can we place an agent inside an organization where stakeholders act as surrogate users?</p>
     </div>
     <figure class="card">
       <h3 class="chart-title">Pilot: GDPval win + tie rate (%), Gemini 3.1 Pro</h3>
       <div id="pilotBars" class="chart" role="img" aria-label="Pilot study. Single worker 43.0, self-reflection 48.7, manager feedback over one round 53.2, three roles over three rounds 55.7."></div>
     </figure>
   </div>
+  <p class="pull">Can we place an agent inside an organization where stakeholders act as surrogate users?</p>
 </section>
 
 <!-- ============================== 02 METHOD ============================== -->
 <section class="section wrap" id="method">
   <div class="sec-head">
     <p class="sec-num">02 · The method</p>
-    <h2>One worker. A <em>virtual organization</em> around it.</h2>
+    <h2>An agent in a <em>virtual organization</em>, just like humans.</h2>
     <p class="lede">A planner assembles simulated stakeholders who inspect the current artifact and hand back their contributions. The worker alone revises the deliverable, for up to three rounds.</p>
   </div>
 
@@ -200,10 +199,10 @@
   </ol>
 
   <div class="learn-stats">
-    <div><span class="ls-num">5 → 42</span><span class="ls-text">skills after 20 tasks (Gemini 3.1 Pro); 5 → 40 for Qwen 3.6 27B</span></div>
-    <div><span class="ls-num">640</span><span class="ls-text">candidate executions ranked on the Gemini campaign</span></div>
-    <div><span class="ls-num">139 / 532</span><span class="ls-text">comparable mutations outranked their parent skill (Gemini)</span></div>
-    <div><span class="ls-num">0</span><span class="ls-text">benchmark labels seen while learning</span></div>
+    <div><span class="ls-num">5 → 42</span><span class="ls-text">skills after 20 tasks with Gemini (40 with Qwen)</span></div>
+    <div><span class="ls-num">640</span><span class="ls-text">candidate skills tried and ranked with Gemini</span></div>
+    <div><span class="ls-num">26%</span><span class="ls-text">of mutations beat the skill they came from</span></div>
+    <div><span class="ls-num">0</span><span class="ls-text">benchmark labels used while learning</span></div>
   </div>
 
   <!-- Signature piece 2: skill library explorer -->
@@ -268,7 +267,7 @@
 <section class="section wrap" id="results">
   <div class="sec-head">
     <p class="sec-num">04 · Results</p>
-    <h2>Better artifacts that <em>transfer</em> across domains and models.</h2>
+    <h2>Gains that <em>transfer</em> across domains and models.</h2>
     <p class="lede">Libraries learned on 20 GDPval tasks are frozen, then tested on GDPval, JobBench and Harvey's Legal Agent Benchmark (LAB).</p>
   </div>
 
@@ -277,18 +276,16 @@
     <div class="card result-card">
       <div class="table-wrap"><table class="results" id="mainTable"></table></div>
     </div>
-    <p class="result-note">ReOrg and ReasoningBank + MaTTS learn only on GDPval. ReasoningBank, AWM and MemP adapt on each benchmark. Bold marks the best score in each column.</p>
   </div>
 
   <div class="result">
-    <h3 class="takeaway">Skills learned in any one domain improve all three: <span class="hl">every one of the nine pairs</span> beats a random organization.</h3>
+    <h3 class="takeaway">With Qwen, skills learned in any one domain improve all three: <span class="hl">every one of the nine pairs</span> beats a random organization.</h3>
     <div class="card result-card">
       <div class="heat-pair">
         <div><h4 class="chart-title">Gain over single worker (points)</h4><div id="heatSingle" class="heat"></div></div>
         <div><h4 class="chart-title">Gain over random organization (points)</h4><div id="heatRandom" class="heat"></div></div>
       </div>
     </div>
-    <p class="result-note">Qwen 3.6 27B. Each row is a library learned on 20 unlabeled tasks from that domain.</p>
   </div>
 
   <div class="result">
@@ -340,12 +337,12 @@
 
 <footer class="footer">
   <div class="wrap footer-inner">
-    <span>ReOrg · University of California, Los Angeles · Google Cloud AI Research</span>
+    <span>ReOrg · Work done during Di Wu's internship at Google Cloud AI Research</span>
     <span><a data-link="code" href="#">Code</a> · <a data-link="paper" href="#">Paper</a> · <a href="#top">Back to top ↑</a></span>
   </div>
 </footer>
 
-<script src="assets/js/library-data.js?v=4"></script>
-<script src="assets/js/main.js?v=4"></script>
+<script src="assets/js/library-data.js?v=5"></script>
+<script src="assets/js/main.js?v=5"></script>
 </body>
 </html>

@@ -153,7 +153,7 @@
       el('path', { d: `M${X(opt.min) - 4} ${H - m.b - 2} l4 -4 l4 8`, fill: 'none', stroke: 'var(--ink-3)', 'stroke-width': 1.1 }, svg);
       rows.forEach((r, i) => {
         const y = m.t + i * rowH + 6, bh = rowH - 12;
-        el('text', { x: m.l - 10, y: y + bh / 2 + 4.5, 'text-anchor': 'end', 'font-size': w < 420 ? 12 : 13, 'font-weight': r.bold ? 650 : 450, fill: 'var(--ink)', text: r.label }, svg);
+        el('text', { x: m.l - 10, y: y + bh / 2 + 4.5, 'text-anchor': 'end', 'font-size': w < 420 ? 12 : 13, 'font-weight': r.bold ? 650 : 450, fill: 'var(--ink)', text: (w < 520 && r.short) ? r.short : r.label }, svg);
         const rect = el('rect', { x: X(opt.min), y, width: Math.max(1, X(r.v) - X(opt.min)), height: bh, rx: 3, fill: r.color }, svg);
         el('title', { text: `${r.label}: ${r.v.toFixed(1)}` }, rect);
         el('text', { x: X(r.v) + 6, y: y + bh / 2 + 4.5, 'font-size': 12.5, 'font-weight': r.bold ? 700 : 550, fill: r.bold ? 'var(--coral-ink)' : 'var(--ink)', text: r.v.toFixed(1) }, svg);
@@ -166,8 +166,8 @@
   mount($('#pilotBars'), hBars([
     { label: 'Single worker', v: 43.0, color: 'var(--yellow)' },
     { label: 'Self-reflection', v: 48.7, color: 'var(--blue-light)' },
-    { label: 'Manager feedback, 1 round', v: 53.2, color: 'var(--green)' },
-    { label: 'Three roles, 3 rounds', v: 55.7, color: 'var(--blue-deep)' },
+    { label: 'Manager feedback, 1 round', short: 'Manager, 1 round', v: 53.2, color: 'var(--green)' },
+    { label: 'Three roles, 3 rounds', short: '3 roles, 3 rounds', v: 55.7, color: 'var(--blue-deep)' },
   ], { min: 40, max: 60, step: 5, labelW: 190 }));
 
   // ---------------- reflection round stepper ----------------
@@ -594,7 +594,7 @@
     { fam: 'ours', name: 'ReOrg (3 rounds)', v: [60.5, 31.0, 62.0, 70.3, 47.7, 76.9] },
   ];
   const FAM = {
-    single: { name: 'Reference', color: 'var(--yellow)' },
+    single: { name: 'No reflection', color: 'var(--yellow)' },
     proc: { name: 'Procedural knowledge', color: 'var(--blue-deep)' },
     self: { name: 'Self-reflection', color: 'var(--blue-light)' },
     org: { name: 'Organizational reflection', color: 'var(--green)' },
@@ -643,11 +643,11 @@
 
   mount($('#lunaBars'), hBars([
     { label: 'Single worker', v: 72.4, color: 'var(--yellow)' },
-    { label: 'ReasoningBank + MaTTS', v: 74.1, color: 'var(--blue-deep)' },
-    { label: 'Self-reflection (1 round)', v: 74.6, color: 'var(--blue-light)' },
-    { label: 'Random organization', v: 75.2, color: 'var(--green)' },
-    { label: 'ReOrg · Gemini-learned skills', v: 75.1, color: 'var(--coral)', bold: true },
-    { label: 'ReOrg · Qwen-learned skills', v: 76.2, color: 'var(--coral)', bold: true },
+    { label: 'ReasoningBank + MaTTS', short: 'RB + MaTTS', v: 74.1, color: 'var(--blue-deep)' },
+    { label: 'Self-reflection (1 round)', short: 'Self-reflection', v: 74.6, color: 'var(--blue-light)' },
+    { label: 'Random organization', short: 'Random org.', v: 75.2, color: 'var(--green)' },
+    { label: 'ReOrg · Gemini-learned skills', short: 'ReOrg (Gemini)', v: 75.1, color: 'var(--coral)', bold: true },
+    { label: 'ReOrg · Qwen-learned skills', short: 'ReOrg (Qwen)', v: 76.2, color: 'var(--coral)', bold: true },
   ], { min: 70, max: 77, step: 1, labelW: 210 }));
 
   // Accuracy vs cost (tokens in millions, win+tie %).

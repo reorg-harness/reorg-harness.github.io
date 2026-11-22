@@ -97,7 +97,6 @@ sup { font-size: .68em; }
 .authors span { white-space: nowrap; }
 .affils { margin: 0; font-size: 14px; color: var(--ink-2); }
 .affils .dot { margin: 0 6px; color: var(--ink-3); }
-.note { margin: 4px 0 0; font-size: 12.5px; color: var(--ink-3); }
 .tagline { margin: 30px auto 0; font-size: clamp(19px, 2.6vw, 24px); line-height: 1.35; font-weight: 600; letter-spacing: -0.015em; }
 .tagline .muted { font-weight: 500; }
 .cta { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 28px 0 44px; }
@@ -121,14 +120,17 @@ sup { font-size: .68em; }
 
 /* ---------- sections ---------- */
 .section { padding: 88px 0 8px; }
-.sec-head { max-width: 780px; margin-bottom: 30px; }
+.sec-head { margin-bottom: 30px; }
 .sec-num { font: 500 12px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--coral-ink); margin: 0 0 14px; }
-.sec-head h2 { font-size: clamp(27px, 3.8vw, 40px); line-height: 1.12; font-weight: 650; letter-spacing: -0.028em; text-wrap: balance; }
+/* Section titles stay on one line on desktop: the longest is ~26.5em, so font-size tracks container width. */
+.sec-head h2 { font-size: clamp(26px, 3.4vw, 40px); line-height: 1.15; font-weight: 650; letter-spacing: -0.028em; text-wrap: balance; }
+@media (min-width: 900px) { .sec-head h2 { white-space: nowrap; } }
 .sec-head h2 em { font-size: 1.08em; color: var(--coral-ink); }
-.lede { font-size: 17.5px; color: var(--ink-2); margin: 16px 0 0; text-wrap: pretty; }
+.lede { font-size: 17.5px; color: var(--ink-2); margin: 16px 0 0; max-width: 780px; text-wrap: pretty; }
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; align-items: start; }
 .prose p { margin: 0 0 16px; color: var(--ink-2); font-size: 16.5px; text-wrap: pretty; }
-.pull { font-family: var(--serif); font-style: italic; font-size: 22px !important; line-height: 1.35; color: var(--ink) !important; border-left: 3px solid var(--coral); padding: 2px 0 2px 16px; margin-top: 24px !important; }
+.pull { font-family: var(--serif); font-style: italic; font-size: clamp(20px, 2.3vw, 27px); line-height: 1.35; color: var(--ink); text-align: center; margin: 56px auto 0; text-wrap: balance; }
+@media (min-width: 900px) { .pull { white-space: nowrap; } }
 figure { margin: 0; }
 figure.card { padding: 18px 20px; }
 figcaption, .caption { font-size: 13.5px; color: var(--ink-3); line-height: 1.55; margin: 12px 0 0; text-wrap: pretty; }
