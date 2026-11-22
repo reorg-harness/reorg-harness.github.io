@@ -166,9 +166,9 @@
   mount($('#pilotBars'), hBars([
     { label: 'Single worker', v: 43.0, color: 'var(--yellow)' },
     { label: 'Self-reflection', v: 48.7, color: 'var(--blue-light)' },
-    { label: 'Manager feedback', v: 53.2, color: 'var(--green)' },
-    { label: 'Three stakeholder roles', v: 55.7, color: 'var(--blue-deep)' },
-  ], { min: 40, max: 60, step: 5, labelW: 180 }));
+    { label: 'Manager feedback, 1 round', v: 53.2, color: 'var(--green)' },
+    { label: 'Three roles, 3 rounds', v: 55.7, color: 'var(--blue-deep)' },
+  ], { min: 40, max: 60, step: 5, labelW: 190 }));
 
   // ---------------- reflection round stepper ----------------
   (function roundStepper() {
@@ -204,7 +204,8 @@
 
     const stepsEl = $('#rSteps');
     STEPS.forEach((s, i) => {
-      const li = h('li', null, `<b>${i + 1} · ${s.k}</b>${s.t}`);
+      const li = h('li', null, `<b>${i + 1}</b>${s.k}`);
+      li.title = s.t;
       li.addEventListener('click', () => { stop(); go(i); });
       stepsEl.appendChild(li);
     });
@@ -245,7 +246,6 @@
           el('rect', { class: 'box', x: x - bw2, y: cy - 22, width: bw2 * 2, height: 44, rx: 10, fill: lit ? ACTS[n.act].color : 'var(--surface)', stroke: lit ? 'transparent' : 'var(--line-2)' }, g);
           el('text', { x, y: cy - 3, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 700, fill: lit ? '#1b2a33' : 'var(--ink)', text: ROLES[n.role].code }, g);
           el('text', { x, y: cy + 12, 'text-anchor': 'middle', 'font-size': small ? 8.5 : 10, 'font-family': 'JetBrains Mono, monospace', fill: lit ? '#1b2a33' : 'var(--ink-3)', text: ACTS[n.act].name }, g);
-          if (!small) el('text', { x, y: cy + 38, 'text-anchor': 'middle', 'font-size': 10.5, fill: 'var(--ink-3)', text: ROLES[n.role].name.replace('Same-job ', '').replace(' reviewer', '') }, g);
         }
       });
       // Loop-In partner
@@ -286,7 +286,7 @@
     }
     function renderMemo() {
       const revised = step >= 6;
-      $('#rMemoState').textContent = revised ? 'revised A₁' : 'draft A₀';
+      $('#rMemoTitle').textContent = revised ? 'Worker’s memo, revised' : 'Worker’s memo, first draft';
       $('#rMemoBody').innerHTML = MEMO.map(l => `<div class="memo-line${revised ? ' added' : ''}"><span class="k">${l.k}</span><span>${revised ? l.b : l.a}</span></div>`).join('');
     }
     function go(i) {
@@ -297,7 +297,6 @@
       renderThread(prev === step ? step - 1 : Math.min(prev, step - 1));
       renderMemo();
       $('#rCaption').textContent = CAPTIONS[step];
-      $('#rSkillNote').textContent = step >= 1 ? 'Feedback → Propose → Loop-In' : 'planner picks from the library';
     }
     const playBtn = $('#rPlay');
     function setPlayUI() { playBtn.classList.toggle('paused', !playing); playBtn.querySelector('.ctl-text').textContent = playing ? 'Pause' : 'Play'; playBtn.setAttribute('aria-label', playing ? 'Pause' : 'Play'); }
@@ -419,69 +418,72 @@
     return svg;
   }
 
-  // ---------------- skill library explorer ----------------
+  // ---------------- skill library explorer (animated) ----------------
   (function explorer() {
     const LIB = window.REORG_LIB; if (!LIB || !$('#explorer')) return;
-    const TASKS = ['Initial seed library',
+    const TASKS = ['Five seed skills',
       'Inventory location report', 'Musician payroll workbook', 'Duplex market analysis', 'Partnership pitch deck',
       'OpenStreetMap freight query', 'Audit sample selection', 'AI-in-government literature review', 'In-ear monitor system design',
       'Work-time activity analysis', '30-second green-energy spot', 'American option pricing framework', 'Rugged flashlight concept design',
       'Sourcing workflow redesign', 'Sarasota restaurant guide', 'Retail channel strategy slide', 'Surgical case-log benchmarks',
       'Daily task list', 'Bridal sales objection training', 'Hormone therapy prescribing guidelines', 'Weekly sales performance report'];
     const SEED_NAMES = ['Worker alone (no stakeholders)', 'Manager Feedback', 'Manager Propose', 'Manager Loop-In', 'Manager Feedback → Propose'];
-    const st = { model: 'gemini', t: 20, act: 'all', sort: 'learned', sel: null };
-    const grid = $('#exGrid'), slider = $('#exSlider');
+    const LAST = 20, STEP_MS = 850;
+    const st = { model: 'gemini', t: reduceMotion ? LAST : 0, act: 'all', sort: 'newest', sel: null, playing: false };
+    const grid = $('#exGrid'), slider = $('#exSlider'), playBtn = $('#exPlay');
+    let timer = null, started = false;
+    slider.value = st.t;
 
-    const visible = () => LIB.libraries[st.model].filter(s => s.t <= st.t);
-    function maxUse() { return Math.max(...LIB.libraries[st.model].map(s => s.use)); }
-    function seedName(s) { return SEED_NAMES[LIB.libraries[st.model].filter(x => x.seed).indexOf(s)] || 'Seed'; }
+    const lib = () => LIB.libraries[st.model];
+    const visible = () => lib().filter(s => s.t <= st.t);
+    const maxUse = () => Math.max(...lib().map(s => s.use));
+    const seedName = s => SEED_NAMES[lib().filter(x => x.seed).indexOf(s)] || 'Seed';
 
     function renderSpark() {
-      const box = $('#exSpark');
       const dyn = LIB.dynamics[st.model];
-      const W = 600, H = 46, n = dyn.length, bw = W / n;
+      const W = 600, H = 46, bw = W / dyn.length;
       const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, preserveAspectRatio: 'none' });
       dyn.forEach((d, i) => {
         const bh = Math.max(2, d[0] / 42 * (H - 4));
         const r = el('rect', { x: i * bw + 1.5, y: H - bh, width: bw - 3, height: bh, rx: 1.5, fill: i === st.t ? 'var(--coral)' : i < st.t ? 'var(--blue-light)' : 'var(--surface-3)', 'fill-opacity': i < st.t ? 0.55 : 1 }, svg);
-        el('title', { text: `After task ${i}: ${d[0]} skills (+${d[1]} new, ${d[2]} reinforced)` }, r);
-        r.addEventListener('click', () => { st.t = i; slider.value = i; update(true); });
+        el('title', { text: `After task ${i}: ${d[0]} skills` }, r);
+        r.addEventListener('click', () => { stop(); setT(i, true); });
       });
-      box.replaceChildren(svg);
+      $('#exSpark').replaceChildren(svg);
     }
 
     function renderGrid(animateNew) {
       let list = visible();
       if (st.act !== 'all') list = list.filter(s => s.n.some(n => n[1] === st.act));
-      if (st.sort === 'use') list = [...list].sort((a, b) => b.use - a.use || a.t - b.t);
-      else if (st.sort === 'size') list = [...list].sort((a, b) => b.n.length - a.n.length || b.e.length - a.e.length);
+      if (st.sort === 'newest') list = [...list].sort((a, b) => b.t - a.t || b.use - a.use);
+      else if (st.sort === 'use') list = [...list].sort((a, b) => b.use - a.use || a.t - b.t);
+      else list = [...list].sort((a, b) => b.n.length - a.n.length || b.e.length - a.e.length);
       const mu = maxUse();
       grid.replaceChildren();
       list.forEach(s => {
-        const b = h('button', 'sk' + (s.id === st.sel ? ' sel' : '') + (animateNew && st.t > 0 && s.t === st.t ? ' new' : ''));
+        const isNew = animateNew && st.t > 0 && s.t === st.t;
+        const b = h('button', 'sk' + (s.id === st.sel ? ' sel' : '') + (isNew ? ' new' : ''));
         b.type = 'button';
-        b.setAttribute('aria-label', `Skill ${s.id}, ${s.n.length} stakeholder nodes, used on ${s.use} held-out tasks`);
+        b.setAttribute('aria-label', `${s.seed ? 'Seed skill' : 'Skill learned on task ' + s.t}, ${s.n.length} stakeholders, used on ${s.use} held-out tasks`);
         b.appendChild(miniGraph(s));
-        const meta = h('div', 'sk-meta', `<span>${s.id} · ${s.seed ? 'seed' : 'task ' + s.t}</span><span>${s.use ? 'used ' + s.use : '—'}</span>`);
-        b.appendChild(meta);
-        const bar = h('div', 'sk-bar', `<i style="width:${(s.use / mu * 100).toFixed(1)}%"></i>`);
-        b.appendChild(bar);
-        b.addEventListener('click', () => { st.sel = s.id; renderGrid(false); renderDetail(); });
+        b.appendChild(h('div', 'sk-meta', `<span>${s.seed ? 'Seed' : 'Task ' + s.t}</span><span>${s.use ? 'used ' + s.use : ''}</span>`));
+        b.appendChild(h('div', 'sk-bar', `<i style="width:${(s.use / mu * 100).toFixed(1)}%"></i>`));
+        b.addEventListener('click', () => { stop(); st.sel = s.id; renderGrid(false); renderDetail(); });
         grid.appendChild(b);
       });
-      if (!list.length) grid.appendChild(h('p', 'ex-caption', 'No skills match this filter yet.'));
+      if (!list.length) grid.appendChild(h('p', 'ex-empty', 'No skills with this action yet.'));
+      grid.scrollTop = 0;
     }
 
     function renderDetail() {
-      const lib = visible();
-      let s = lib.find(x => x.id === st.sel);
-      if (!s) { s = [...lib].sort((a, b) => b.use - a.use)[0]; st.sel = s && s.id; }
+      const v = visible();
+      let s = v.find(x => x.id === st.sel);
+      if (!s) { s = [...v].sort((a, b) => b.use - a.use)[0]; st.sel = s && s.id; }
       const box = $('#exDetail');
       if (!s) { box.replaceChildren(); return; }
       const L = layout(s);
       const nodes = L.order.filter(k => k !== 'in' && k !== 'out').map(k => s.n[k]);
-      const origin = s.seed ? `Seed skill · ${seedName(s)}` : `Learned on task ${s.t} · ${TASKS[s.t]}`;
-      box.innerHTML = `<p class="label">Selected skill</p><h4>${s.id}</h4><p class="d-sub">${origin}</p>`;
+      box.innerHTML = `<h4>${s.seed ? 'Seed skill' : 'Learned on task ' + s.t}</h4><p class="d-sub">${s.seed ? seedName(s) : TASKS[s.t]}</p>`;
       box.appendChild(detailGraph(s));
       const ul = h('ul');
       nodes.forEach(([role, act]) => {
@@ -491,35 +493,77 @@
       });
       if (!nodes.length) ul.appendChild(h('li', null, 'The worker revises with no stakeholder input.'));
       box.appendChild(ul);
-      box.appendChild(h('div', 'd-stats', `<span><b>${s.n.length}</b> nodes</span><span><b>${L.maxD}</b> deep</span><span>used on <b>${s.use}</b>/165 held-out tasks</span>${s.re ? `<span>reinforced <b>${s.re}×</b></span>` : ''}`));
+      box.appendChild(h('div', 'd-stats', `<span>Picked for <b>${s.use}</b> of 165 held-out tasks</span>${s.re ? `<span>Rediscovered <b>${s.re}×</b></span>` : ''}`));
     }
 
+    // Composition panel: built once, then widths update so they animate.
+    const actKeys = Object.keys(ACTS);
+    $('#exActions').innerHTML = `<div class="stack">${actKeys.map(k => `<i data-k="${k}" style="width:33%;background:${ACTS[k].color}"></i>`).join('')}</div>` +
+      `<div class="stack-legend">${actKeys.map(k => `<span data-k="${k}"></span>`).join('')}</div>`;
+    $('#exRoles').innerHTML = ROLE_ORDER.map(r => `<div class="rolebar" data-r="${r}" title="${ROLES[r].desc}"><span>${ROLES[r].name}</span><span class="track"><i style="width:0%"></i></span><span></span></div>`).join('');
     function renderComp() {
-      const lib = visible();
+      const v = visible();
       const counts = { feedback: 0, propose: 0, loop_in: 0 };
-      lib.forEach(s => s.n.forEach(n => counts[n[1]]++));
+      v.forEach(s => s.n.forEach(n => counts[n[1]]++));
       const tot = counts.feedback + counts.propose + counts.loop_in || 1;
-      const pct = k => (counts[k] / tot * 100);
-      let html = `<div class="stack">${Object.keys(ACTS).map(k => `<i style="width:${pct(k)}%;background:${ACTS[k].color}" title="${ACTS[k].name} ${pct(k).toFixed(1)}%"></i>`).join('')}</div>`;
-      html += `<div class="stack-legend">${Object.keys(ACTS).map(k => `<span>${ACTS[k].name} ${pct(k).toFixed(0)}%</span>`).join('')}</div>`;
-      $('#exActions').innerHTML = html;
-      const cov = ROLE_ORDER.map(r => [r, lib.filter(s => s.n.some(n => n[0] === r)).length / lib.length]);
-      $('#exRoles').innerHTML = `<p class="label" style="margin:2px 0 6px">Share of skills with each role</p>` +
-        cov.map(([r, v]) => `<div class="rolebar" title="${ROLES[r].desc}"><span>${ROLES[r].name}</span><span class="track"><i style="width:${(v * 100).toFixed(1)}%"></i></span><span>${Math.round(v * 100)}%</span></div>`).join('');
+      actKeys.forEach(k => {
+        const p = counts[k] / tot * 100;
+        $(`#exActions .stack i[data-k="${k}"]`).style.width = p + '%';
+        $(`#exActions .stack-legend span[data-k="${k}"]`).textContent = `${ACTS[k].name} ${Math.round(p)}%`;
+      });
+      ROLE_ORDER.forEach(r => {
+        const share = v.filter(s => s.n.some(n => n[0] === r)).length / v.length;
+        const row = $(`#exRoles .rolebar[data-r="${r}"]`);
+        row.querySelector('.track i').style.width = (share * 100).toFixed(1) + '%';
+        row.lastElementChild.textContent = Math.round(share * 100) + '%';
+      });
     }
 
     function update(animateNew) {
-      $('#exTaskNum').textContent = st.t;
       const d = LIB.dynamics[st.model][st.t];
-      const delta = [d[1] ? `+${d[1]} new` : 'no new skills', d[2] ? `${d[2]} reinforced` : ''].filter(Boolean).join(', ');
-      $('#exTaskName').textContent = st.t === 0 ? `${TASKS[0]} · ${d[0]} skills` : `${TASKS[st.t]} · ${d[0]} skills (${delta})`;
+      $('#exTaskNum').textContent = st.t === 0 ? 'Before learning' : `Task ${st.t} of ${LAST}`;
+      $('#exTaskName').textContent = st.t === 0 ? TASKS[0] : `${TASKS[st.t]} · ${d[1] ? `+${d[1]} new` : 'no new skills'}`;
+      $('#exCount').textContent = d[0];
       renderSpark(); renderGrid(animateNew); renderDetail(); renderComp();
+      setPlayUI();
+    }
+    function setT(t, animateNew) {
+      st.t = t; slider.value = t;
+      // While playing, follow the most-used skill learned on this task.
+      if (st.playing) {
+        const fresh = lib().filter(s => s.t === t).sort((a, b) => b.use - a.use)[0];
+        if (fresh) st.sel = fresh.id;
+      }
+      update(animateNew);
     }
 
-    slider.addEventListener('input', () => { st.t = +slider.value; update(true); });
+    function setPlayUI() {
+      const atEnd = st.t >= LAST;
+      playBtn.querySelector('.ctl-icon').textContent = st.playing ? '❚❚' : atEnd ? '↺' : '▶';
+      playBtn.querySelector('.ctl-text').textContent = st.playing ? 'Pause' : atEnd ? 'Replay' : 'Play';
+      playBtn.setAttribute('aria-label', st.playing ? 'Pause' : atEnd ? 'Replay' : 'Play');
+    }
+    function tick() {
+      timer = setTimeout(() => {
+        if (st.t >= LAST) { stop(); return; }
+        setT(st.t + 1, true);
+        if (st.t >= LAST) stop(); else tick();
+      }, STEP_MS);
+    }
+    function play() {
+      clearTimeout(timer);
+      if (st.t >= LAST) { st.sel = null; st.playing = true; setT(0, false); }
+      st.playing = true; setPlayUI(); tick();
+    }
+    function stop() { st.playing = false; clearTimeout(timer); setPlayUI(); }
+
+    playBtn.addEventListener('click', () => (st.playing ? stop() : play()));
+    slider.addEventListener('input', () => { stop(); setT(+slider.value, true); });
     $$('#explorer .seg-btn').forEach(b => b.addEventListener('click', () => {
       $$('#explorer .seg-btn').forEach(x => { x.classList.toggle('is-on', x === b); x.setAttribute('aria-selected', x === b); });
-      st.model = b.dataset.model; st.sel = null; update(false);
+      const wasPlaying = st.playing;
+      stop(); st.model = b.dataset.model; st.sel = null;
+      if (wasPlaying || st.t === LAST) { st.t = LAST; play(); } else update(false);
     }));
     $$('#exFilters .fchip').forEach(b => b.addEventListener('click', () => {
       $$('#exFilters .fchip').forEach(x => x.classList.toggle('is-on', x === b));
@@ -527,6 +571,12 @@
     }));
     $('#exSort').addEventListener('change', e => { st.sort = e.target.value; renderGrid(false); });
     update(false);
+    // Play once, the first time the explorer scrolls into view.
+    if (!reduceMotion) {
+      new IntersectionObserver((ents, obs) => {
+        if (!started && ents.some(e => e.isIntersecting)) { started = true; obs.disconnect(); play(); }
+      }, { threshold: 0.3 }).observe($('#explorer'));
+    }
   })();
 
   // ---------------- results ----------------
@@ -567,11 +617,11 @@
   function heatmap(vals) {
     return function (w) {
       const labels = ['GDPval', 'JobBench', 'LAB'];
-      const lw = 88, top = 46;
+      const lw = 108, top = 46;
       const cell = Math.min(92, (w - lw - 4) / 3);
       const W = lw + cell * 3, H = top + cell * 3 + 4;
       const svg = svgRoot(W, H);
-      el('text', { x: lw + cell * 1.5, y: 12, 'text-anchor': 'middle', 'font-size': 10.5, fill: 'var(--ink-3)', 'font-family': 'JetBrains Mono, monospace', text: 'EVALUATED ON →' }, svg);
+      el('text', { x: lw + cell * 1.5, y: 13, 'text-anchor': 'middle', 'font-size': 12.5, fill: 'var(--ink-2)', text: 'Tested on →' }, svg);
       labels.forEach((l, j) => el('text', { x: lw + cell * j + cell / 2, y: top - 8, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 600, fill: 'var(--ink)', text: l }, svg));
       labels.forEach((l, i) => {
         el('text', { x: lw - 10, y: top + cell * i + cell / 2 + 4, 'text-anchor': 'end', 'font-size': 12, 'font-weight': 600, fill: 'var(--ink)', text: l }, svg);
@@ -583,7 +633,7 @@
           el('text', { x: x + cell / 2, y: y + cell / 2 + 6, 'text-anchor': 'middle', 'font-size': cell > 70 ? 17 : 14, 'font-weight': 650, fill: f > 0.5 ? '#fff' : 'var(--ink)', text: '+' + v.toFixed(1) }, svg);
         });
       });
-      el('text', { x: lw - 10, y: top - 8, 'text-anchor': 'end', 'font-size': 10.5, fill: 'var(--ink-3)', 'font-family': 'JetBrains Mono, monospace', text: 'LEARNED ON ↓' }, svg);
+      el('text', { x: lw - 10, y: top - 8, 'text-anchor': 'end', 'font-size': 12.5, fill: 'var(--ink-2)', text: 'Learned on ↓' }, svg);
       svg.setAttribute('width', '100%'); svg.style.maxWidth = W + 'px';
       return svg;
     };
@@ -623,12 +673,11 @@
       ],
     },
   };
-  let costModel = 'gemini';
   $('#costLegend').innerHTML = COST.gemini.series.map(s => `<span><i style="background:${FAM[s.fam].color};border-radius:50%"></i>${s.name}</span>`).join('');
-  function costChart(w) {
+  function costChart(w, costModel) {
     const d = COST[costModel];
-    const H = w < 520 ? 270 : 320;
-    const m = { l: 40, r: 14, t: 14, b: 40 };
+    const H = w < 420 ? 250 : 280;
+    const m = { l: 54, r: 14, t: 14, b: 42 };
     const svg = svgRoot(w, H);
     const iw = w - m.l - m.r, ih = H - m.t - m.b;
     const xmax = costModel === 'gemini' ? 1.8 : 4.0;
@@ -643,7 +692,8 @@
     for (let v = 0; v <= xmax + 1e-9; v += xstep) {
       el('text', { x: X(v), y: H - m.b + 16, 'text-anchor': 'middle', 'font-size': 11, fill: 'var(--ink-3)', text: v < 1e-9 ? '0' : (Math.round(v * 10) / 10) + 'M' }, svg);
     }
-    el('text', { x: m.l + iw / 2, y: H - 6, 'text-anchor': 'middle', 'font-size': 11.5, fill: 'var(--ink-3)', text: 'mean tokens per task' }, svg);
+    el('text', { x: m.l + iw / 2, y: H - 6, 'text-anchor': 'middle', 'font-size': 12.5, fill: 'var(--ink-2)', text: 'Tokens per task' }, svg);
+    el('text', { x: 12, y: m.t + ih / 2, 'text-anchor': 'middle', 'font-size': 12.5, fill: 'var(--ink-2)', transform: `rotate(-90 12 ${m.t + ih / 2})`, text: 'Win + tie (%)' }, svg);
     d.series.forEach(s => {
       const c = FAM[s.fam].color;
       if (s.pts.length > 1) el('path', { d: s.pts.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)} ${Y(p[1]).toFixed(1)}`).join(' '), fill: 'none', stroke: c, 'stroke-width': s.fam === 'ours' ? 2.4 : 1.6, 'stroke-dasharray': s.fam === 'self' ? '5 4' : null }, svg);
@@ -658,16 +708,8 @@
     el('text', { x: X(last[0]) - 8, y: Y(last[1]) - 12, 'text-anchor': 'end', 'font-size': 12, 'font-weight': 700, fill: 'var(--coral-ink)', text: `ReOrg ${last[1].toFixed(1)}` }, svg);
     return svg;
   }
-  const refreshCost = mount($('#costChart'), costChart);
-  $$('[data-cost]').forEach(b => b.addEventListener('click', () => {
-    $$('[data-cost]').forEach(x => x.classList.toggle('is-on', x === b));
-    costModel = b.dataset.cost; refreshCost();
-  }));
-
-  $$('.tab').forEach(tab => tab.addEventListener('click', () => {
-    $$('.tab').forEach(t => { const on = t === tab; t.classList.toggle('is-on', on); t.setAttribute('aria-selected', on); });
-    $$('.tab-panel').forEach(p => { const on = p.dataset.panel === tab.dataset.tab; p.hidden = !on; p.classList.toggle('is-on', on); });
-  }));
+  mount($('#costGemini'), w => costChart(w, 'gemini'));
+  mount($('#costQwen'), w => costChart(w, 'qwen'));
 
   // ---------------- case timeline ----------------
   (function timeline() {
