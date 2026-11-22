@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ReOrg: Evolving Reflective Organization Skills for Enterprise Agents</title>
+<meta name="description" content="ReOrg places one knowledge-work agent inside a virtual organization of simulated stakeholders, and learns reusable organizational reflection skills from unlabeled tasks.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ReOrg: Evolving Reflective Organization Skills for Enterprise Agents">
+<meta property="og:description" content="One agent does the work. A learned virtual organization makes it ready to hand off. +9.1 and +13.0 points on GDPval, learned from 20 unlabeled tasks.">
+<meta property="og:url" content="https://reorg-harness.github.io/">
+<meta property="og:image" content="https://reorg-harness.github.io/assets/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ReOrg: Evolving Reflective Organization Skills for Enterprise Agents">
+<meta name="twitter:description" content="One agent does the work. A learned virtual organization makes it ready to hand off.">
+<meta name="twitter:image" content="https://reorg-harness.github.io/assets/img/og.png">
+<meta name="theme-color" content="#FBFAF7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1519" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@1,6..72,400;1,6..72,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<script>
+  // Apply a saved theme before first paint.
+  try { var t = localStorage.getItem('reorg-theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch (e) {}
+</script>
+</head>
+<body>
+
+<header class="nav" id="top">
+  <div class="nav-inner">
+    <a class="brand" href="#top" aria-label="ReOrg home">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" style="fill:var(--ink)"/><path d="M9.8 12.6 13.6 16.6M16 10.9V15.2M22.2 12.6 18.4 16.6" style="stroke:var(--bg)" stroke-width="1.3" stroke-linecap="round"/><circle cx="16" cy="19.5" r="4.2" style="fill:var(--coral)"/><circle cx="8.6" cy="11" r="2.6" style="fill:var(--yellow)"/><circle cx="16" cy="8.2" r="2.6" style="fill:var(--blue-light)"/><circle cx="23.4" cy="11" r="2.6" style="fill:var(--green)"/></svg>
+      <span>ReOrg</span>
+    </a>
+    <nav class="nav-links" aria-label="Sections">
+      <a href="#problem">Problem</a>
+      <a href="#method">Method</a>
+      <a href="#learning">Learning</a>
+      <a href="#results">Results</a>
+      <a href="#case">Case</a>
+      <a href="#cite">Cite</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="nav-btn" data-link="paper" href="#">Paper</a>
+      <a class="nav-btn" data-link="code" href="#">Code</a>
+      <button class="theme-btn" id="themeBtn" type="button" aria-label="Toggle color theme">
+        <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.2A8 8 0 1 1 9.8 4a6.4 6.4 0 0 0 10.2 10.2z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ============================== HERO ============================== -->
+<section class="hero wrap">
+  <p class="eyebrow">Organizational reflection for knowledge-work agents</p>
+  <h1 class="hero-title"><span class="accent">ReOrg</span>: Evolving <b>Re</b>flective <b>Org</b>anization Skills for Enterprise Agents</h1>
+  <p class="authors">
+    <span>Di Wu<sup>1*</sup></span>, <span>Rujun Han<sup>2</sup></span>, <span>Yanfei Chen<sup>2</sup></span>, <span>Yifei Ming<sup>2</sup></span>, <span>Han Yu<sup>2</sup></span>, <span>Yufan Zhuang<sup>2</sup></span>, <span>Tomas Pfister<sup>2</sup></span>, and <span>Chen-Yu Lee<sup>2</sup></span>
+  </p>
+  <p class="affils"><sup>1</sup>University of California, Los Angeles <span class="dot">·</span> <sup>2</sup>Google Cloud AI Research</p>
+  <p class="note">*Work done while Di Wu interned at Google Cloud AI Research.</p>
+
+  <p class="tagline"><span class="muted">One agent does the work.</span><br>A learned organization makes it ready to hand off.</p>
+
+  <div class="cta">
+    <a class="btn btn-primary" href="#method">See a reflection round <span aria-hidden="true">→</span></a>
+    <a class="btn" data-link="paper" href="#"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></svg><span>Paper</span></a>
+    <a class="btn" data-link="code" href="#"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18-6-6 6-6M15 6l6 6-6 6"/></svg><span>Code</span></a>
+    <a class="btn" href="#cite"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h4v4H8v3a2 2 0 0 0 2 2M14 7h4v4h-3v3a2 2 0 0 0 2 2"/></svg><span>BibTeX</span></a>
+  </div>
+
+  <div class="hero-grid">
+    <figure class="card hero-chart">
+      <div class="card-head">
+        <span class="label">GDPval · win + tie vs. expert deliverables</span>
+        <span class="label subtle">185 tasks · %</span>
+      </div>
+      <div id="heroBars" class="chart" role="img" aria-label="GDPval win plus tie rate. Gemini 3.1 Pro: single worker 51.4, self-reflection 53.5, ReOrg 60.5. Qwen 3.6 27B: single worker 57.3, self-reflection 64.3, ReOrg 70.3."></div>
+      <div class="legend">
+        <span><i style="background:var(--yellow)"></i>Single worker</span>
+        <span><i style="background:var(--blue-light)"></i>Self-reflection</span>
+        <span><i style="background:var(--coral)"></i>ReOrg (up to 3 rounds)</span>
+      </div>
+    </figure>
+    <div class="hero-stats">
+      <div class="card stat">
+        <div class="stat-num">20</div>
+        <div class="stat-text">unlabeled GDPval tasks to learn the skill library. No reference answers, no rubrics.</div>
+      </div>
+      <div class="card stat">
+        <div class="stat-num">9<span class="of">/9</span></div>
+        <div class="stat-text">source → target domain pairs improve over a random organization (Qwen 3.6 27B).</div>
+      </div>
+      <div class="card stat">
+        <div class="stat-num">+3.8<span class="unit">pts</span></div>
+        <div class="stat-text">on GDPval when Qwen-learned skills run on GPT 5.6 Luna (72.4 → 76.2).</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== 01 PROBLEM ============================== -->
+<section class="section wrap" id="problem">
+  <div class="sec-head">
+    <p class="sec-num">01 · The problem</p>
+    <h2>Done is not the same as <em>ready</em>.</h2>
+  </div>
+  <div class="two-col">
+    <div class="prose">
+      <p>Long-horizon agents can now write the memo, build the spreadsheet and draft the deck. Whether that artifact is ready for someone else depends on who reads it. A manager checks whether it answers the assignment. A legal reviewer checks what could go wrong when it is relied on. A teammate checks the numbers.</p>
+      <p>People get these perspectives from the organization around them. Agents usually get two choices: wait for a human to give more guidance, or critique their own work.</p>
+      <p class="pull">Can we place an agent inside an organization where stakeholders act as surrogate users?</p>
+    </div>
+    <figure class="card">
+      <div class="card-head"><span class="label">Pilot · GDPval · Gemini 3.1 Pro</span><span class="label subtle">win + tie %</span></div>
+      <div id="pilotBars" class="chart" role="img" aria-label="Pilot study. Single worker 43.0, self-reflection 48.7, manager feedback 53.2, three stakeholder roles 55.7."></div>
+      <figcaption>One outside perspective beats self-critique by 4.5 points. The three-role condition also adds revision rounds, so it does not isolate role diversity. The pilot uses its own setup, separate from the main evaluation.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============================== 02 METHOD ============================== -->
+<section class="section wrap" id="method">
+  <div class="sec-head">
+    <p class="sec-num">02 · The method</p>
+    <h2>One worker. A <em>virtual organization</em> around it.</h2>
+    <p class="lede">A planner assembles simulated stakeholders who inspect the current artifact and hand back their contributions. The worker alone revises the deliverable, for up to three rounds.</p>
+  </div>
+
+  <div class="principles">
+    <div class="card principle">
+      <span class="p-num">A</span>
+      <h3>The worker owns the deliverable</h3>
+      <p>Stakeholders inspect files and check numbers with local tools in separate read-only contexts. They never edit the artifact.</p>
+    </div>
+    <div class="card principle">
+      <span class="p-num">B</span>
+      <h3>Three ways to contribute</h3>
+      <p><span class="chip act-f">Feedback</span> flags defects and risks. <span class="chip act-p">Propose</span> suggests concrete changes. <span class="chip act-l">Loop-In</span> consults another colleague and returns a joint summary.</p>
+    </div>
+    <div class="card principle">
+      <span class="p-num">C</span>
+      <h3>A skill is a small graph</h3>
+      <p>Each node pairs a stakeholder role with an action, and edges route contributions downstream. A skill stores no task content, so it can be reused on new tasks.</p>
+    </div>
+  </div>
+
+  <!-- Signature piece 1: reflection round stepper -->
+  <div class="card round" id="round">
+    <div class="round-top">
+      <div>
+        <p class="label">One reflection round, step by step</p>
+        <h3 class="round-title">Site acquisition memo <span class="tag">illustrative</span></h3>
+      </div>
+      <div class="controls">
+        <button type="button" class="ctl" id="rPlay" aria-label="Pause"><span class="i-pause">❚❚</span><span class="i-play">▶</span><span class="ctl-text">Pause</span></button>
+        <button type="button" class="ctl" id="rPrev" aria-label="Previous step">←</button>
+        <button type="button" class="ctl" id="rNext" aria-label="Next step">→</button>
+        <button type="button" class="ctl" id="rReset" aria-label="Restart">↺</button>
+      </div>
+    </div>
+
+    <ol class="steps" id="rSteps" aria-label="Steps"></ol>
+
+    <div class="round-body">
+      <div class="round-left">
+        <div class="panel">
+          <div class="panel-head"><span class="label">Retrieved reflection skill</span><span class="label subtle" id="rSkillNote">planner picks from the library</span></div>
+          <div id="rGraph" class="round-graph"></div>
+        </div>
+        <div class="panel memo" id="rMemo">
+          <div class="panel-head"><span class="label">Worker's memo</span><span class="label subtle" id="rMemoState">draft A₀</span></div>
+          <div class="memo-body" id="rMemoBody"></div>
+        </div>
+      </div>
+      <div class="panel round-right">
+        <div class="panel-head"><span class="label">Shared discussion</span><span class="label subtle">stakeholders: read-only</span></div>
+        <div class="thread" id="rThread" aria-live="polite"></div>
+      </div>
+    </div>
+    <p class="round-caption" id="rCaption"></p>
+  </div>
+
+  <details class="figure-details">
+    <summary>View the overview figure from the paper</summary>
+    <img src="assets/img/reorg_overview-1200.webp" srcset="assets/img/reorg_overview-1200.webp 1200w, assets/img/reorg_overview.webp 2400w" sizes="(max-width: 1100px) 100vw, 1060px" alt="Paper Figure 1: organizational reflection around a single worker, and GDPval win plus tie rates." loading="lazy" width="2400" height="924">
+  </details>
+</section>
+
+<!-- ============================== 03 LEARNING ============================== -->
+<section class="section wrap" id="learning">
+  <div class="sec-head">
+    <p class="sec-num">03 · Learning without labels</p>
+    <h2>Learn <em>who to ask</em>, and how, from unlabeled tasks.</h2>
+    <p class="lede">ReOrg evolves a library of reflection skills on a stream of 20 unlabeled tasks. Every candidate skill is judged by the artifact it produces, not by its description, and no reference answers or rubrics are used.</p>
+  </div>
+
+  <ol class="pipeline">
+    <li class="card pipe"><span class="pipe-n">1</span><h3>Retrieve</h3><p>The planner picks seed skills from the library using its notes from earlier tasks.</p></li>
+    <li class="card pipe"><span class="pipe-n">2</span><h3>Mutate</h3><p>Beam search replaces a role, inserts a node, or relocates and grafts an edge.</p></li>
+    <li class="card pipe"><span class="pipe-n">3</span><h3>Reflect and revise</h3><p>Each candidate runs for real: stakeholders reflect, and the worker revises once.</p></li>
+    <li class="card pipe"><span class="pipe-n">4</span><h3>Rank blindly</h3><p>The same model ranks blinded artifacts against the task materials. No ground truth.</p></li>
+    <li class="card pipe"><span class="pipe-n">5</span><h3>Promote and summarize</h3><p>Strong skills join the library, and notes on what helped feed the planner.</p></li>
+  </ol>
+
+  <div class="learn-stats">
+    <div><span class="ls-num">5 → 42</span><span class="ls-text">skills after 20 tasks (Gemini 3.1 Pro); 5 → 40 for Qwen 3.6 27B</span></div>
+    <div><span class="ls-num">640</span><span class="ls-text">candidate executions ranked on the Gemini campaign</span></div>
+    <div><span class="ls-num">139 / 532</span><span class="ls-text">comparable mutations outranked their parent skill (Gemini)</span></div>
+    <div><span class="ls-num">0</span><span class="ls-text">benchmark labels seen while learning</span></div>
+  </div>
+
+  <!-- Signature piece 2: skill library explorer -->
+  <div class="card explorer" id="explorer">
+    <div class="ex-top">
+      <div>
+        <p class="label">Skill library explorer · real learned skills</p>
+        <h3 class="ex-title">Watch the library grow, task by task</h3>
+      </div>
+      <div class="seg" role="tablist" aria-label="Backbone model">
+        <button type="button" role="tab" class="seg-btn is-on" data-model="gemini" aria-selected="true">Gemini 3.1 Pro</button>
+        <button type="button" role="tab" class="seg-btn" data-model="qwen" aria-selected="false">Qwen 3.6 27B</button>
+      </div>
+    </div>
+
+    <div class="ex-scrub">
+      <div class="scrub-row">
+        <label for="exSlider" class="label">After adaptation task</label>
+        <output id="exTaskNum" class="scrub-num">20</output>
+        <span id="exTaskName" class="scrub-task"></span>
+      </div>
+      <input type="range" id="exSlider" min="0" max="20" step="1" value="20" aria-describedby="exTaskName">
+      <div id="exSpark" class="spark" aria-hidden="true"></div>
+    </div>
+
+    <div class="ex-body">
+      <div class="ex-main">
+        <div class="ex-toolbar">
+          <div class="filters" id="exFilters" aria-label="Filter by action">
+            <button type="button" class="fchip is-on" data-act="all">All</button>
+            <button type="button" class="fchip" data-act="feedback"><i class="dotc act-f"></i>has Feedback</button>
+            <button type="button" class="fchip" data-act="propose"><i class="dotc act-p"></i>has Propose</button>
+            <button type="button" class="fchip" data-act="loop_in"><i class="dotc act-l"></i>has Loop-In</button>
+          </div>
+          <label class="sort">Sort
+            <select id="exSort">
+              <option value="learned">Order learned</option>
+              <option value="use">Most used on held-out tasks</option>
+              <option value="size">Largest graph</option>
+            </select>
+          </label>
+        </div>
+        <div class="ex-grid" id="exGrid"></div>
+      </div>
+      <aside class="ex-side">
+        <div class="ex-detail" id="exDetail"></div>
+        <div class="ex-comp">
+          <p class="label">Library composition</p>
+          <div id="exActions"></div>
+          <div id="exRoles"></div>
+        </div>
+      </aside>
+    </div>
+    <p class="ex-caption">Graphs are the stored skills from the two GDPval learning campaigns. "Used" counts how often the frozen planner chose a skill for the first reflection round on the 165 held-out GDPval tasks. Frequencies describe the library. They do not measure each role's causal contribution.</p>
+  </div>
+
+  <details class="figure-details">
+    <summary>View the continual-learning figure from the paper</summary>
+    <img src="assets/img/continual_learning-1200.webp" srcset="assets/img/continual_learning-1200.webp 1200w, assets/img/continual_learning.webp 2400w" sizes="(max-width: 1100px) 100vw, 1060px" alt="Paper Figure 2: continual learning of reflection skills and retrieval knowledge, and artifact-guided evolutionary search." loading="lazy" width="2400" height="1501">
+  </details>
+</section>
+
+<!-- ============================== 04 RESULTS ============================== -->
+<section class="section wrap" id="results">
+  <div class="sec-head">
+    <p class="sec-num">04 · Results</p>
+    <h2>Better artifacts that <em>transfer</em> across domains and models.</h2>
+    <p class="lede">Libraries learned on 20 GDPval tasks are frozen, then evaluated on GDPval, JobBench and Harvey's Legal Agent Benchmark (LAB), against procedural-memory, self-reflection and organizational baselines.</p>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="Results views">
+    <button type="button" role="tab" class="tab is-on" data-tab="main" aria-selected="true">Main results</button>
+    <button type="button" role="tab" class="tab" data-tab="domains" aria-selected="false">Across domains</button>
+    <button type="button" role="tab" class="tab" data-tab="models" aria-selected="false">Across models</button>
+    <button type="button" role="tab" class="tab" data-tab="cost" aria-selected="false">Accuracy vs. cost</button>
+  </div>
+
+  <div class="tab-panel card is-on" data-panel="main" role="tabpanel">
+    <div class="table-wrap">
+      <table class="results" id="mainTable"></table>
+    </div>
+    <p class="caption">GDPval: win + tie rate against expert deliverables (three-judge majority, 185 tasks). JobBench: rubric-weighted score (128 tasks). LAB: rubric-item pass rate (200 tasks). ReOrg and ReasoningBank + MaTTS learn from 20 unlabeled GDPval tasks and carry their resources to JobBench and LAB. ReasoningBank, AWM and MemP adapt in-domain on 20 tasks per benchmark. GDPval scores cover the full cohort, which includes the 20 adaptation tasks. <b>Bold</b> marks the best entry per column.</p>
+  </div>
+
+  <div class="tab-panel card" data-panel="domains" role="tabpanel" hidden>
+    <div class="heat-pair">
+      <div><p class="label">Gain over single worker (pp)</p><div id="heatSingle" class="heat"></div></div>
+      <div><p class="label">Gain over random organization (pp)</p><div id="heatRandom" class="heat"></div></div>
+    </div>
+    <p class="caption">Qwen 3.6 27B. Each row's library is learned from 20 unlabeled tasks in that domain, then frozen and evaluated in each column's domain. All nine pairs improve over both baselines, and the six cross-domain gains over a random organization range from 1.7 to 5.4 points. The best source is not always the target domain itself.</p>
+  </div>
+
+  <div class="tab-panel card" data-panel="models" role="tabpanel" hidden>
+    <div id="lunaBars" class="chart" role="img" aria-label="GPT 5.6 Luna on GDPval: single worker 72.4, ReasoningBank plus MaTTS 74.1, self-reflection 74.6, random organization 75.2, ReOrg with Gemini skills 75.1, ReOrg with Qwen skills 76.2."></div>
+    <p class="caption">GDPval win + tie (%) with GPT 5.6 Luna in its native Codex harness, running skills learned by other models. Qwen-learned skills reach 76.2 (+3.8), and Gemini-learned skills reach 75.1 (+2.7), about level with a random organization.</p>
+  </div>
+
+  <div class="tab-panel card" data-panel="cost" role="tabpanel" hidden>
+    <div class="cost-top">
+      <div class="seg small" role="tablist" aria-label="Model">
+        <button type="button" class="seg-btn is-on" data-cost="gemini">Gemini 3.1 Pro</button>
+        <button type="button" class="seg-btn" data-cost="qwen">Qwen 3.6 27B</button>
+      </div>
+      <div class="legend" id="costLegend"></div>
+    </div>
+    <div id="costChart" class="chart" role="img" aria-label="GDPval win plus tie rate against mean tokens per task."></div>
+    <p class="caption">Mean tokens per GDPval task against win + tie. ReOrg reaches the highest rates, and that comes with extra inference: the strongest baselines (57.3 for Gemini, 66.5 for Qwen) are cheaper. The results do not establish an advantage at every token budget.</p>
+  </div>
+</section>
+
+<!-- ============================== 05 CASE ============================== -->
+<section class="section wrap" id="case">
+  <div class="sec-head">
+    <p class="sec-num">05 · A closer look</p>
+    <h2>From a losing workbook to a <em>3–0</em> win.</h2>
+    <p class="lede">A held-out GDPval task with Qwen 3.6 27B: build a workbook of wells across eight Illinois municipal systems and email the manager a list of candidates. Candidates must be active, 160–200 feet deep and in sand-and-gravel aquifers.</p>
+  </div>
+  <div class="timeline" id="timeline"></div>
+  <p class="caption center">Votes are candidate-versus-expert decisions from the three-judge panel. This is one selected case. It shows feedback accumulating over rounds, and it does not isolate the effect of any single role or skill.</p>
+</section>
+
+<!-- ============================== CITE ============================== -->
+<section class="section wrap" id="cite">
+  <div class="sec-head">
+    <p class="sec-num">06 · Citation</p>
+    <h2>Cite ReOrg</h2>
+  </div>
+  <div class="card bib">
+    <button type="button" class="copy" id="copyBib">Copy</button>
+<pre id="bibtex"><code>@article{wu2026reorg,
+  title={ReOrg: Evolving Reflective Organization Skills for Enterprise Agents},
+  author={Wu, Di and Han, Rujun and Chen, Yanfei and Ming, Yifei and Yu, Han and Zhuang, Yufan and Pfister, Tomas and Lee, Chen-Yu},
+  year={2026}
+}</code></pre>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <span>ReOrg · University of California, Los Angeles · Google Cloud AI Research</span>
+    <span><a data-link="code" href="#">Code</a> · <a data-link="paper" href="#">Paper</a> · <a href="#top">Back to top ↑</a></span>
+  </div>
+</footer>
+
+<script src="assets/js/library-data.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
